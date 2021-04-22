@@ -22,6 +22,8 @@ int yaksuri_cudai_info_create_hook(yaksi_info_s * info)
     infopriv->iov_unpack_threshold = YAKSURI_CUDAI_INFO__DEFAULT_IOV_PUP_THRESHOLD;
     infopriv->inbuf.is_valid = false;
     infopriv->outbuf.is_valid = false;
+    infopriv->inbuf.is_ipc = false;
+    infopriv->outbuf.is_ipc = false;
 
     info->backend.cuda.priv = (void *) infopriv;
 
@@ -57,6 +59,12 @@ int yaksuri_cudai_info_keyval_append(yaksi_info_s * info, const char *key, const
         assert(vallen == sizeof(struct cudaPointerAttributes));
         infopriv->outbuf.is_valid = true;
         memcpy(&infopriv->outbuf.attr, val, sizeof(struct cudaPointerAttributes));
+    }
+    /* no value is needed for flag type info key. False by default, true when set */
+    else if (!strncmp(key, "yaksa_cuda_inbuf_ptr_is_ipc", YAKSA_INFO_MAX_KEYLEN)) {
+        infopriv->inbuf.is_ipc = true;
+    } else if (!strncmp(key, "yaksa_cuda_outbuf_ptr_is_ipc", YAKSA_INFO_MAX_KEYLEN)) {
+        infopriv->outbuf.is_ipc = true;
     }
 
     return YAKSA_SUCCESS;

@@ -54,6 +54,7 @@ typedef struct {
     uintptr_t iov_unpack_threshold;
     struct {
         bool is_valid;
+        bool is_ipc;
         struct cudaPointerAttributes attr;
     } inbuf, outbuf;
 } yaksuri_cudai_info_s;
