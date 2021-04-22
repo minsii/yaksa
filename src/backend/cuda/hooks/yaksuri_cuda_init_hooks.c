@@ -9,6 +9,10 @@
 #include <string.h>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
+#ifdef ENABLE_NVTOOLEXT
+#include <nvToolsExt.h>
+#include <nvToolsExtCudaRt.h>
+#endif
 
 static void *cuda_host_malloc(uintptr_t size)
 {
@@ -157,6 +161,14 @@ int yaksuri_cuda_init_hook(yaksur_gpudriver_hooks_s ** hooks)
 
         cerr = cudaStreamCreateWithFlags(&yaksuri_cudai_global.stream[i], cudaStreamNonBlocking);
         YAKSURI_CUDAI_CUDA_ERR_CHKANDJUMP(cerr, rc, fn_fail);
+
+#ifdef ENABLE_NVTOOLEXT
+        char name[100];
+        sprintf(name, "dev%d", i);
+        nvtxNameCudaDeviceA(i, name);
+        sprintf(name, "dev%d-stream", i);
+        nvtxNameCudaStreamA(yaksuri_cudai_global.stream[i], name);
+#endif
 
         for (int j = 0; j < yaksuri_cudai_global.ndevices; j++) {
             if (i == j) {
