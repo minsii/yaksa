@@ -1110,8 +1110,14 @@ static int set_subreq_pack_d2d(const void *inbuf, void *outbuf, uintptr_t count,
         (request->backend.inattr.device == request->backend.outattr.device ||
          check_p2p_comm(id, reqpriv->request->backend.inattr.device,
                         reqpriv->request->backend.outattr.device)) && aligned) {
-        rc = singlechunk_pack(id, request->backend.inattr.device, inbuf, outbuf, count,
-                              type, info, op, subreq);
+        int device;
+        if (request->backend.outattr.type == YAKSUR_PTR_TYPE__GPU_IPC) {
+            device = request->backend.outattr.device;
+        } else {
+            device = request->backend.inattr.device;
+        }
+
+        rc = singlechunk_pack(id, device, inbuf, outbuf, count, type, info, op, subreq_ptr);
     }
     /* Fast path for other reduce operations with aligned buffer on the same device */
     else if (request->backend.inattr.device == request->backend.outattr.device && aligned) {
@@ -1291,8 +1297,13 @@ static int set_subreq_unpack_d2d(const void *inbuf, void *outbuf, uintptr_t coun
         (request->backend.inattr.device == request->backend.outattr.device ||
          check_p2p_comm(id, reqpriv->request->backend.inattr.device,
                         reqpriv->request->backend.outattr.device)) && aligned) {
-        rc = singlechunk_unpack(id, request->backend.inattr.device, inbuf, outbuf, count,
-                                type, info, op, subreq);
+        int device;
+        if (request->backend.outattr.type == YAKSUR_PTR_TYPE__GPU_IPC) {
+            device = request->backend.outattr.device;
+        } else {
+            device = request->backend.inattr.device;
+        }
+        rc = singlechunk_unpack(id, device, inbuf, outbuf, count, type, info, op, subreq_ptr);
     }
     /* Fast path for other reduce operations with aligned buffer on the same device */
     else if (request->backend.inattr.device == request->backend.outattr.device && aligned) {
