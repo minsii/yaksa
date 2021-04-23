@@ -1203,6 +1203,7 @@ static int set_subreq_pack_from_device(const void *inbuf, void *outbuf, uintptr_
 
     switch (request->backend.outattr.type) {
         case YAKSUR_PTR_TYPE__GPU:
+        case YAKSUR_PTR_TYPE__GPU_IPC:
             rc = set_subreq_pack_d2d(inbuf, outbuf, count, type, info, op, request, reqpriv,
                                      subreq);
             break;
@@ -1377,6 +1378,7 @@ static int set_subreq_unpack_from_device(const void *inbuf, void *outbuf, uintpt
 
     switch (request->backend.outattr.type) {
         case YAKSUR_PTR_TYPE__GPU:
+        case YAKSUR_PTR_TYPE__GPU_IPC:
             rc = set_subreq_unpack_d2d(inbuf, outbuf, count, type, info, op, request, reqpriv,
                                        subreq);
             break;
@@ -1457,7 +1459,9 @@ int yaksuri_progress_enqueue(const void *inbuf, void *outbuf, uintptr_t count, y
 
     assert(yaksuri_global.gpudriver[id].hooks);
     assert(request->backend.inattr.type == YAKSUR_PTR_TYPE__GPU ||
-           request->backend.outattr.type == YAKSUR_PTR_TYPE__GPU);
+           request->backend.inattr.type == YAKSUR_PTR_TYPE__GPU_IPC ||
+           request->backend.outattr.type == YAKSUR_PTR_TYPE__GPU ||
+           request->backend.outattr.type == YAKSUR_PTR_TYPE__GPU_IPC);
 
     reqpriv->info = info;
 
@@ -1476,6 +1480,7 @@ int yaksuri_progress_enqueue(const void *inbuf, void *outbuf, uintptr_t count, y
     if (reqpriv->optype == YAKSURI_OPTYPE__PACK) {
         switch (request->backend.inattr.type) {
             case YAKSUR_PTR_TYPE__GPU:
+            case YAKSUR_PTR_TYPE__GPU_IPC:
                 rc = set_subreq_pack_from_device(inbuf, outbuf, count, type, info, op, request,
                                                  reqpriv, subreq);
                 break;
@@ -1497,6 +1502,7 @@ int yaksuri_progress_enqueue(const void *inbuf, void *outbuf, uintptr_t count, y
     } else {
         switch (request->backend.inattr.type) {
             case YAKSUR_PTR_TYPE__GPU:
+            case YAKSUR_PTR_TYPE__GPU_IPC:
                 rc = set_subreq_unpack_from_device(inbuf, outbuf, count, type, info, op, request,
                                                    reqpriv, subreq);
                 break;

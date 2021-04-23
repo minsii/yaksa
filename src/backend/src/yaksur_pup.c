@@ -48,7 +48,9 @@ static int ipup(const void *inbuf, void *outbuf, uintptr_t count, yaksi_type_s *
             YAKSU_ERR_CHECK(rc, fn_fail);
 
             if (request->backend.inattr.type == YAKSUR_PTR_TYPE__GPU ||
-                request->backend.outattr.type == YAKSUR_PTR_TYPE__GPU) {
+                request->backend.inattr.type == YAKSUR_PTR_TYPE__GPU_IPC ||
+                request->backend.outattr.type == YAKSUR_PTR_TYPE__GPU ||
+                request->backend.outattr.type == YAKSUR_PTR_TYPE__GPU_IPC) {
                 reqpriv->gpudriver_id = id;
                 break;
             }
